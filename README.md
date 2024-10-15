@@ -1,83 +1,72 @@
-# Doctrine Lock Messenger Bundle
+# Currency Api Bundle
 
-The `doctrine-lock-messenger-bundle` provides middleware for Symfony Messenger to handle message deduplication and waiting mechanisms using Doctrine and Symfony Lock.
+This Symfony bundle provides integration with the Currency Beacon API, allowing you to fetch and manage currency data within your Symfony application.
 
 ## Installation
 
-To install the bundle, use Composer:
+1. Install the bundle using Composer:
 
 ```bash
-composer require bigoen/doctrine-lock-messenger-bundle
+composer require bigoen/currency-api-bundle
 ```
 
-## Configuration
-
-Add the bundle to your Symfony application by updating the `config/bundles.php` file:
+2. Enable the bundle in your `config/bundles.php` file:
 
 ```php
 return [
     // ...
-    Bigoen\DoctrineLockMessengerBundle\BigoenCurrencyApiBundle::class => ['all' => true],
+    Bigoen\CurrencyApiBundle\BigoenCurrencyApiBundle::class => ['all' => true],
 ];
 ```
 
-If the bundle is not automatically added, you need to manually add it to the `config/bundles.php` file as shown above.
+## Configuration
+
+Add the following environment variables to your `.env` file:
+
+```dotenv
+###> bigoen/currency-api-bundle ###
+CURRENCY_BEACON_API_KEY=your_api_key_here
+###< bigoen/currency-api-bundle ###
+```
 
 ## Usage
 
-### Deduplication Middleware
+To use the Currency API service, you can inject it into your services or use it manually:
 
-The `DeduplicationMiddleware` ensures that duplicate messages are not processed concurrently.
+## Commands
 
-```php
-use Symfony\Component\Messenger\MessageBusInterface;
-use Bigoen\DoctrineLockMessengerBundle\Stamp\DeduplicationStamp;
+This bundle provides commands to manage currency data:
 
-$message = new YourMessage();
-$envelope = (new Envelope($message))->with(new DeduplicationStamp('unique_key', 300));
+- To update currencies, use:
+    ```bash
+    php bin/console exchange-rate:currency-beacon:currency-update
+    ```
 
-$bus->dispatch($envelope);
-```
+- To fetch the latest or historical daily exchange rates, use:
+    ```bash
+    php bin/console exchange-rate:currency-beacon:daily-update
+    ```
 
-### Wait Middleware
+Alternatively, you can use the `CurrencyBeaconService` directly in your code:
 
-The `WaitMiddleware` allows messages to be delayed until a lock is acquired.
+- To update currencies manually, use the `updateCurrencies` method:
+    ```php
+    $currencyBeaconService->updateCurrencies();
+    ```
 
-```php
-use Symfony\Component\Messenger\MessageBusInterface;
-use Bigoen\DoctrineLockMessengerBundle\Stamp\WaitStamp;
+- To update daily exchange rates manually, use the `updateDailyExchangeRates` method:
+    ```php
+    $currencyBeaconService->updateDailyExchangeRates();
+    ```
 
-$message = new YourMessage();
-$envelope = (new Envelope($message))->with(new WaitStamp('unique_key', 300));
+To query daily exchange rates by date and currency, you can use the `DailyExchangeRateRepository`:
 
-$bus->dispatch($envelope);
-```
-
-## Example
-
-Here is an example of how to use both middlewares in a Symfony Messenger configuration:
-
-```yaml
-# config/packages/messenger.yaml
-framework:
-    messenger:
-        buses:
-            messenger.bus.default:
-                middleware:
-                    - Bigoen\DoctrineLockMessengerBundle\Middleware\DeduplicationMiddleware
-                    - Bigoen\DoctrineLockMessengerBundle\Middleware\WaitMiddleware
-```
-
-You can also configure the default message bus for the `LockMessageBus`:
-
-```yaml
-# config/services.yaml
-services:
-    bigoen_doctrine_lock_messenger.message_bus:
-        alias: 'messenger.bus.default'
-```
+- Example query:
+    ```php
+    $repository = $entityManager->getRepository(DailyExchangeRate::class);
+    $exchangeRate = $repository->findOneBy(['date' => $date, 'currency' => $currency]);
+    ```
 
 ## License
 
-This bundle is released under the MIT License. See the bundled LICENSE file for details.
-```
+This bundle is released under the MIT License. See the bundled `LICENSE` file for details.
