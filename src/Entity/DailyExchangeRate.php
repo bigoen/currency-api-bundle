@@ -9,7 +9,6 @@ use Carbon\CarbonInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'exchange_rate_daily')]
 #[ORM\Entity(repositoryClass: DailyExchangeRateRepository::class)]
@@ -21,21 +20,17 @@ final class DailyExchangeRate
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\NotBlank]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Currency $baseCurrency = null;
 
-    #[Assert\NotBlank]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Currency $currency = null;
 
-    #[Assert\NotBlank]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private \DateTimeInterface|CarbonInterface|null $date = null;
+    private ?CarbonInterface $date = null;
 
-    #[Assert\NotBlank]
     #[ORM\Column]
     private ?float $value = null;
 
@@ -68,12 +63,12 @@ final class DailyExchangeRate
         return $this;
     }
 
-    public function getDate(): \DateTimeInterface|CarbonInterface|null
+    public function getDate(): ?CarbonInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface|CarbonInterface $date): static
+    public function setDate(CarbonInterface $date): static
     {
         $this->date = $date;
 

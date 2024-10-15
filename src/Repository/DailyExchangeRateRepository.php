@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace Bigoen\CurrencyApiBundle\Repository;
 
 use Bigoen\CurrencyApiBundle\Entity\DailyExchangeRate;
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -23,28 +27,19 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
         parent::__construct($registry, DailyExchangeRate::class);
     }
 
-    //    /**
-    //     * @return Daily[] Returns an array of DailyExchangeRate objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('e.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findOldDate(): ?CarbonInterface
+    {
+        try {
+            $data = $this->createQueryBuilder('dailyExchangeRate')
+                ->select('dailyExchangeRate.date')
+                ->orderBy('dailyExchangeRate.date', 'ASC')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (NoResultException|NonUniqueResultException) {
+            $data = null;
+        }
 
-    //    public function findOneBySomeField($value): ?DailyExchangeRate
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $data ? Carbon::createFromFormat('Y-m-d', $data) : null;
+    }
 }

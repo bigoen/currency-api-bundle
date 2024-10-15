@@ -7,7 +7,6 @@ namespace Bigoen\CurrencyApiBundle\Entity;
 use Bigoen\CurrencyApiBundle\Repository\CurrencyRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'exchange_rate_currency')]
 #[ORM\Entity(repositoryClass: CurrencyRepository::class)]
@@ -19,13 +18,9 @@ final class Currency
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\NotBlank]
-    #[Assert\Length(min: 1, max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $code = null;
 
-    #[Assert\NotBlank]
-    #[Assert\Length(min: 1, max: 355)]
     #[ORM\Column(length: 355)]
     private ?string $name = null;
 
