@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bigoen\CurrencyApiBundle\Command\OpenSource;
+namespace Bigoen\CurrencyApiBundle\Command\Fawaz;
 
-use Bigoen\CurrencyApiBundle\Services\OpenSourceService;
+use Bigoen\CurrencyApiBundle\Services\FawazService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,12 +17,12 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 #[AsCommand(
-    name: 'exchange-rate:open-source:currency-update',
+    name: 'exchange-rate:fawaz:currency-update',
     description: 'Update currency from https://github.com/fawazahmed0/exchange-api?tab=readme-ov-file',
 )]
 final class CurrencyUpdateCommand extends Command
 {
-    public function __construct(private readonly OpenSourceService $service)
+    public function __construct(private readonly FawazService $service)
     {
         parent::__construct();
     }

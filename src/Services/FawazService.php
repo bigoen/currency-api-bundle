@@ -24,7 +24,7 @@ use function Symfony\Component\String\u;
 /**
  * @author Şafak Saylam <safak@bigoen.com>
  */
-final readonly class OpenSourceService
+final readonly class FawazService
 {
     public function __construct(
         private HttpClientInterface $httpClient,
