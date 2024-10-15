@@ -1,0 +1,27 @@
+{
+	"name": "bigoen/currency-api-bundle",
+	"type": "symfony-bundle",
+	"description": "Currency api bundle for Symfony project.",
+	"license": "LGPL-3.0",
+	"authors": [
+		{
+			"name": "Şafak Saylam",
+			"homepage": "https://safaksaylam.com",
+			"email": "safak@bigoen.com"
+		}
+	],
+	"require": {
+		"php": ">=8.2",
+        "bigoen/carbon-bundle": "dev-master",
+		"doctrine/doctrine-bundle": "^2.0",
+		"symfony/http-client": "^6.0|^7.0",
+		"symfony/string": "^6.0|^7.0",
+		"symfony/validator": "^6.0|^7.0"
+	},
+	"prefer-stable": true,
+	"autoload": {
+		"psr-4": {
+			"Bigoen\\CurrencyApiBundle\\": "src/"
+		}
+	}
+}
