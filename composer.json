@@ -12,8 +12,8 @@
 	],
 	"require": {
 		"php": ">=8.2",
-        "bigoen/carbon-bundle": "dev-master",
 		"doctrine/doctrine-bundle": "^2.0",
+		"nesbot/carbon": "^2.72",
 		"symfony/http-client": "^6.0|^7.0",
 		"symfony/string": "^6.0|^7.0",
 		"symfony/validator": "^6.0|^7.0"
