@@ -65,6 +65,7 @@ To query daily exchange rates by date and currency, you can use the `DailyExchan
     ```php
     $repository = $entityManager->getRepository(DailyExchangeRate::class);
     $exchangeRate = $repository->findOneBy(['date' => $date, 'currency' => $currency]);
+    $amount = $repository->convert('TRY', 'EUR', Carbon::now(), 500);
     ```
 
 ## License
