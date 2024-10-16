@@ -11,7 +11,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Table(name: 'exchange_rate_currency')]
 #[ORM\Entity(repositoryClass: CurrencyRepository::class)]
 #[UniqueEntity('code')]
-final class Currency
+class Currency
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

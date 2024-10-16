@@ -13,7 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Table(name: 'exchange_rate_daily')]
 #[ORM\Entity(repositoryClass: DailyExchangeRateRepository::class)]
 #[UniqueEntity(fields: ['baseCurrency', 'currency', 'date'])]
-final class DailyExchangeRate
+class DailyExchangeRate
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
