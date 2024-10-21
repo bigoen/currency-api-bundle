@@ -49,13 +49,13 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
         }
         // aliases.
         $strDate = $date->format('Y-m-d');
-        // has not rates?
-        if (0 === $this->count(['date' => $date])) {
-            $this->service->updateDailyExchangeRates(date: $date);
-        }
         // fromCurrency to USD.
         if ($fromCurrency !== 'USD') {
             try {
+                // has not rates?
+                if (!$this->has($fromCurrency, $date)) {
+                    $this->service->updateDailyExchangeRates(date: $date);
+                }
                 $fromAmount = (float) $this->createQueryBuilder('dailyExchangeRate')
                     ->select('dailyExchangeRate.value')
                     ->innerJoin('dailyExchangeRate.currency', 'currency')
@@ -68,7 +68,7 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getSingleScalarResult();
             } catch (NoResultException|NonUniqueResultException) {
-                throw new EntityNotFoundException('From currency not found.');
+                throw new EntityNotFoundException("From currency ($fromCurrency) not found.");
             }
         } else {
             $fromAmount = 1;
@@ -76,6 +76,10 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
         // USD to toCurrency.
         if ($toCurrency !== 'USD') {
             try {
+                // has not rates?
+                if (!$this->has($toCurrency, $date)) {
+                    $this->service->updateDailyExchangeRates(date: $date);
+                }
                 $toAmount = (float) $this->createQueryBuilder('dailyExchangeRate')
                     ->select('dailyExchangeRate.value')
                     ->innerJoin('dailyExchangeRate.currency', 'currency')
@@ -88,7 +92,7 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getSingleScalarResult();
             } catch (NoResultException|NonUniqueResultException) {
-                throw new EntityNotFoundException('To currency not found.');
+                throw new EntityNotFoundException("To currency ($toCurrency) not found.");
             }
         } else {
             $toAmount = 1;
@@ -111,5 +115,24 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
         }
 
         return $data ? Carbon::createFromFormat('Y-m-d', $data) : null;
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    private function has(string $currency, CarbonInterface $date): bool
+    {
+        return $this->createQueryBuilder('dailyExchangeRate')
+            ->select('COUNT(dailyExchangeRate.id)')
+            ->innerJoin('dailyExchangeRate.currency', 'currency')
+            ->where('currency.code = :currency')
+            ->andWhere('dailyExchangeRate.date = :date')
+            ->setParameters([
+                'currency' => $currency,
+                'date' => $date->format('Y-m-d'),
+            ])
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
     }
 }
