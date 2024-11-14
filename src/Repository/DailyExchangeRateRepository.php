@@ -68,7 +68,7 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getSingleScalarResult();
             } catch (NoResultException|NonUniqueResultException) {
-                throw new EntityNotFoundException("From currency ($fromCurrency) not found.");
+                throw new EntityNotFoundException("From currency ($fromCurrency) not found for this $strDate date.");
             }
         } else {
             $fromAmount = 1;
@@ -92,7 +92,7 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getSingleScalarResult();
             } catch (NoResultException|NonUniqueResultException) {
-                throw new EntityNotFoundException("To currency ($toCurrency) not found.");
+                throw new EntityNotFoundException("To currency ($toCurrency) not found for this $strDate date.");
             }
         } else {
             $toAmount = 1;
