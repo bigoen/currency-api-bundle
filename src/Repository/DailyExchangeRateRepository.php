@@ -65,6 +65,7 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
                         'fromCurrency' => $fromCurrency,
                         'date' => $strDate,
                     ])
+                    ->setMaxResults(1)
                     ->getQuery()
                     ->getSingleScalarResult();
             } catch (NoResultException|NonUniqueResultException) {
@@ -89,6 +90,7 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
                         'toCurrency' => $toCurrency,
                         'date' => $strDate,
                     ])
+                    ->setMaxResults(1)
                     ->getQuery()
                     ->getSingleScalarResult();
             } catch (NoResultException|NonUniqueResultException) {
@@ -99,6 +101,51 @@ class DailyExchangeRateRepository extends ServiceEntityRepository
         }
 
         return ($amount / $fromAmount) * $toAmount;
+    }
+
+    public function deleteDuplicates(): int
+    {
+        // aliases.
+        $total = 0;
+        $tableName = $this->_em->getClassMetadata($this->getClassName())->getTableName();
+        // find duplicate ids.
+        $conn = $this->_em->getConnection();
+        $sql = "
+            SELECT
+                entity.base_currency_id AS base_currency,
+                entity.currency_id AS currency,
+                entity.date AS date,
+                ARRAY_TO_STRING(ARRAY(SELECT sub.id FROM $tableName sub WHERE sub.base_currency_id = entity.base_currency_id AND sub.currency_id = entity.currency_id AND sub.date = entity.date), ',') AS ids
+            FROM
+                $tableName entity
+            GROUP BY base_currency, currency, date
+            HAVING
+                COUNT(entity.id) > 1
+        ";
+        $resultSet = $conn->executeQuery($sql);
+        $data = $resultSet->fetchAllAssociative();
+        // delete ids.
+        foreach ($data as $value) {
+            // has ids?
+            if (!isset($value['ids'])) {
+                continue;
+            }
+            $ids = explode(',', $value['ids']);
+            foreach ($ids as $key => $id) {
+                if (0 === $key) {
+                    continue;
+                }
+                $this->createQueryBuilder('entity')
+                    ->delete()
+                    ->where('entity.id = :id')
+                    ->setParameter('id', $id)
+                    ->getQuery()
+                    ->execute();
+                ++$total;
+            }
+        }
+
+        return $total;
     }
 
     public function findOldDate(): ?CarbonInterface

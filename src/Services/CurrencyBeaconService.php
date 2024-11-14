@@ -98,6 +98,8 @@ final class CurrencyBeaconService
             }
         }
         $this->entityManager->flush();
+        // delete duplicates.
+        $this->entityManager->getRepository(DailyExchangeRate::class)->deleteDuplicates();
     }
 
     /**
